@@ -1,0 +1,54 @@
+{
+  "overall_metrics": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "eer": 0.0,
+    "eer_threshold": 0.5082,
+    "roc_auc": 1.0,
+    "confusion_matrix": {
+      "true_negatives": 190,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "true_positives": 173
+    }
+  },
+  "per_generator_breakdown": {
+    "bark": {
+      "sample_count": 31,
+      "accuracy": 1.0,
+      "mean_prediction_score": 0.6759
+    },
+    "elevenlabs": {
+      "sample_count": 34,
+      "accuracy": 1.0,
+      "mean_prediction_score": 0.6454
+    },
+    "hifigan": {
+      "sample_count": 34,
+      "accuracy": 1.0,
+      "mean_prediction_score": 0.7228
+    },
+    "openvoice": {
+      "sample_count": 1,
+      "accuracy": 1.0,
+      "mean_prediction_score": 0.7383
+    },
+    "real": {
+      "sample_count": 190,
+      "accuracy": 1.0,
+      "mean_prediction_score": 0.404
+    },
+    "rvc": {
+      "sample_count": 35,
+      "accuracy": 1.0,
+      "mean_prediction_score": 0.6601
+    },
+    "xtts": {
+      "sample_count": 38,
+      "accuracy": 1.0,
+      "mean_prediction_score": 0.7107
+    }
+  }
+}
