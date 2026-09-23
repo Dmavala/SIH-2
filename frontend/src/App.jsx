@@ -38,6 +38,9 @@ export default function App() {
   const [isDyslexicFont, setIsDyslexicFont] = useState(false);
   const [srAnnouncement, setSrAnnouncement] = useState('Aegis Voice Sentinel loaded and ready.');
 
+  // Samples state for benchmark call simulator
+  const [samples, setSamples] = useState([]);
+
   // Settings & Controls
   const [activeModel, setActiveModel] = useState('AASIST');
 
@@ -74,7 +77,8 @@ export default function App() {
     isConnected, sessionId, smoothedRisk, instantRisk, status, label, color,
     anomalies, forensics, latencyMs, waveform, spectral,
     isFrozen, activeChallenge, setActiveChallenge,
-    isMicActive, stopMic, stopMicRef, resumeAfterThreat,
+    isMicActive, stopMic, resumeAfterThreat,
+    isPlayingSample, currentSampleId, playSample, stopSample,
     telephonyMode, handleToggleTelephony, handleResetBuffer,
   } = stream;
 
@@ -86,7 +90,7 @@ export default function App() {
     forensics, anomalies, telephonyMode, showPopup,
   });
 
-  // 1. Fetch Health and Audit Log on mount
+  // 1. Fetch Health, Samples, and Audit Log on mount
   const fetchAuditLog = useCallback(() => {
     fetch(apiUrl('/api/audit-log'))
       .then((res) => res.json())
@@ -101,6 +105,11 @@ export default function App() {
         if (data.active_model) setActiveModel(data.active_model);
       })
       .catch((err) => console.error('Error fetching health:', err));
+
+    fetch(apiUrl('/api/samples'))
+      .then((res) => res.json())
+      .then((data) => setSamples(Array.isArray(data) ? data : []))
+      .catch((err) => console.error('Error fetching samples:', err));
 
     fetchAuditLog();
   }, [fetchAuditLog]);
@@ -168,6 +177,7 @@ export default function App() {
 
   // Reset closes the alert modal too (modal state lives at this level)
   const handleFullReset = () => {
+    if (stopSample) stopSample();
     handleResetBuffer();
     setIsSafetyModalOpen(false);
     setGenericModalConfig(null);
@@ -175,22 +185,23 @@ export default function App() {
     setThreatModalScore(0);
   };
 
-  // Closing the threat advisory RESUMES realtime analysis (fixes the
-  // one-popup-then-dead bug: mic paused on detection, never restarted before).
+  // Closing the threat advisory RESUMES realtime analysis
   const handleSafetyModalClose = useCallback(() => {
+    if (stopSample) stopSample();
     setIsSafetyModalOpen(false);
     setThreatModalScore(0);
     setActiveChallenge(null);
     resumeAfterThreat();
-  }, [resumeAfterThreat]);
+  }, [resumeAfterThreat, stopSample]);
 
   // Toggle mic closes any open safety alerts and begins fresh recording session
   const handleToggleMic = useCallback(() => {
+    if (stopSample) stopSample();
     setIsSafetyModalOpen(false);
     setGenericModalConfig(null);
     setThreatModalScore(0);
     stream.handleToggleMic();
-  }, [stream]);
+  }, [stream, stopSample]);
 
   return (
     <div className={`h-screen w-screen bg-slate-50 text-slate-900 flex flex-col overflow-hidden font-sans antialiased font-scale-${fontSize} ${isHighContrast ? 'high-contrast' : ''} ${isReducedMotion ? 'reduce-motion' : ''} ${isDyslexicFont ? 'dyslexia-font' : ''}`}>
@@ -250,10 +261,15 @@ export default function App() {
           <div className="flex-1 flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-6 gap-5">
             {/* Top: Big Live Speaker & Voice Testing Control */}
             <CallSimulator
+              samples={samples}
               isMicActive={isMicActive}
               onToggleMic={handleToggleMic}
               onResetBuffer={handleFullReset}
               onGenerateDossier={handleGenerateDossier}
+              isPlayingSample={isPlayingSample}
+              currentSampleId={currentSampleId}
+              onPlaySample={playSample}
+              onStopSample={stopSample}
             />
 
             {/* Bottom: Expansive Realtime Waveform & Waterfall Viewer */}

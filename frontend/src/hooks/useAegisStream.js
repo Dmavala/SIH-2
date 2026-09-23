@@ -3,21 +3,9 @@
  *   WebSocket connection + heartbeat + auto-reconnect
  *   Telemetry state (risk, status, forensics, waveform, spectral)
  *   Threat-alert latching (challenge modal trigger)
- *   Live microphone capture (AudioWorklet + ScriptProcessor fallback)
+ *   Live microphone capture with pristine AudioContext lifecycle
+ *   Pre-loaded benchmark audio playback & streaming feeder
  *   16 kHz resampling & chunked PCM streaming
- *
- * Extracted from App.jsx so the UI layer stays declarative.
- *
- * Threat-response lifecycle (important):
- *   When a sustained attack is detected the hook pauses microphone capture
- *   (mic stays armed, session stays open), raises the advisory modal, and
- *   resets backend/client buffers. Closing the modal calls resumeAfterThreat()
- *   which clears the latch, resets telemetry, and restarts the mic.
- *   Two prior bugs made the UI die after the first popup:
- *     1) the mic was hard-stopped on alert and never restarted;
- *     2) the threat pause initially called stopMic(), whose "intentional stop"
- *        flag-wipe erased the resume intent (wasMicActiveRef) before the
- *        modal even closed — fixed by a dedicated teardownMicCapture() pause.
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -49,7 +37,7 @@ class ContinuousAudioProcessor extends AudioWorkletProcessor {
         }
       }
     }
-    return true; // Keep alive indefinitely across any silence or pauses
+    return true;
   }
 }
 registerProcessor('continuous-audio-processor', ContinuousAudioProcessor);
@@ -59,11 +47,11 @@ export default function useAegisStream({ onThreatDetected, onMicError }) {
   // Telemetry state
   const [isConnected, setIsConnected] = useState(false);
   const [sessionId, setSessionId] = useState('');
-  const [smoothedRisk, setSmoothedRisk] = useState(6.0);
-  const [instantRisk, setInstantRisk] = useState(6.0);
-  const [status, setStatus] = useState('AUTHENTIC_HUMAN');
-  const [label, setLabel] = useState('AUTHENTIC HUMAN BIOMETRICS');
-  const [color, setColor] = useState('green');
+  const [smoothedRisk, setSmoothedRisk] = useState(0.0);
+  const [instantRisk, setInstantRisk] = useState(0.0);
+  const [status, setStatus] = useState('IDLE_SILENCE');
+  const [label, setLabel] = useState('MONITORING - AWAITING SPEECH');
+  const [color, setColor] = useState('slate');
   const [anomalies, setAnomalies] = useState([]);
   const [forensics, setForensics] = useState(null);
   const [latencyMs, setLatencyMs] = useState(21.4);
@@ -73,6 +61,8 @@ export default function useAegisStream({ onThreatDetected, onMicError }) {
   const [activeChallenge, setActiveChallenge] = useState(null);
   const [telephonyMode, setTelephonyMode] = useState(false);
   const [isMicActive, setIsMicActive] = useState(false);
+  const [isPlayingSample, setIsPlayingSample] = useState(false);
+  const [currentSampleId, setCurrentSampleId] = useState(null);
 
   // Refs
   const wsRef = useRef(null);
@@ -81,13 +71,15 @@ export default function useAegisStream({ onThreatDetected, onMicError }) {
   const isResettingRef = useRef(false);
   const audioContextRef = useRef(null);
   const micStreamRef = useRef(null);
+  const micSourceRef = useRef(null);
   const micProcessorRef = useRef(null);
   const workletRegisteredRef = useRef(false);
   const audioStreamBufferRef = useRef(new Float32Array(0));
+  const sampleIntervalRef = useRef(null);
+
   const stopMicRef = useRef(null);
-  const teardownMicCaptureRef = useRef(null); // pause mic WITHOUT clearing resume intent
-  const wasMicActiveRef = useRef(false); // mic state before threat pause
-  const isMicActiveRef = useRef(false); // live mic state for WS closures
+  const wasMicActiveRef = useRef(false);
+  const isMicActiveRef = useRef(false);
   isMicActiveRef.current = isMicActive;
   const onThreatDetectedRef = useRef(onThreatDetected);
   onThreatDetectedRef.current = onThreatDetected;
@@ -100,107 +92,98 @@ export default function useAegisStream({ onThreatDetected, onMicError }) {
       pingTimerRef.current = null;
     }
 
-    const ws = new WebSocket(getWebSocketUrl('/ws/audio-stream'));
+    try {
+      const ws = new WebSocket(getWebSocketUrl('/ws/audio-stream'));
 
-    ws.onopen = () => {
-      setIsConnected(true);
-      pingTimerRef.current = setInterval(() => {
-        if (ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({ command: 'PING' }));
-        }
-      }, 5000);
-    };
+      ws.onopen = () => {
+        setIsConnected(true);
+        pingTimerRef.current = setInterval(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ command: 'PING' }));
+          }
+        }, 5000);
+      };
 
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.type === 'PONG') return;
-        if (data.type === 'HANDSHAKE') {
-          setSessionId(data.session_id);
-        } else if (data.type === 'RESET_ACK') {
-          isResettingRef.current = false;
-          setSmoothedRisk(0.0);
-          setInstantRisk(0.0);
-          setStatus('IDLE_SILENCE');
-          setLabel('MONITORING - AWAITING SPEECH');
-          setColor('slate');
-          setAnomalies([]);
-          setForensics(null);
-          setWaveform([]);
-          setSpectral([]);
-          setIsFrozen(false);
-          setActiveChallenge(null);
-          // Allow 800ms microphone stabilization window before re-arming alert trigger
-          setTimeout(() => {
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'PONG') return;
+          if (data.type === 'HANDSHAKE') {
+            setSessionId(data.session_id);
+          } else if (data.type === 'RESET_ACK') {
+            isResettingRef.current = false;
             hasAlertedRef.current = false;
-          }, 800);
-        } else if (data.type === 'TELEMETRY') {
-          // Drop stale frames arriving while resetting or before state settles
-          if (isResettingRef.current) return;
-
-          setSmoothedRisk(data.smoothed_risk);
-          setInstantRisk(data.instant_risk);
-          setStatus(data.status);
-          setLabel(data.label);
-          setColor(data.color);
-          setAnomalies(data.anomalies || []);
-          setForensics(data.forensics);
-          setLatencyMs(data.latency_ms);
-          if (data.waveform_preview) setWaveform(data.waveform_preview);
-          if (data.spectral_preview) setSpectral(data.spectral_preview);
-
-          if (data.is_frozen !== undefined) setIsFrozen(Boolean(data.is_frozen));
-
-          // Only genuine verified synthetic voice attacks trigger the modal & pause mic
-          const isFishy = Boolean(
-            (data.challenge && data.smoothed_risk >= 70.0) ||
-            (data.status === 'CRITICAL_SYNTHETIC' && data.smoothed_risk >= 75.0)
-          );
-
-          if (isFishy && !hasAlertedRef.current && !isResettingRef.current) {
-            hasAlertedRef.current = true;
-            isResettingRef.current = true;
-            if (data.challenge) setActiveChallenge(data.challenge);
-
-            // 1. Trigger the safety advisory popup immediately with true detection data
-            if (onThreatDetectedRef.current) onThreatDetectedRef.current(data);
-
-            // 2. PAUSE (not stop) mic hardware capture — keeps the mic armed so
-            //    closing the advisory can resume analysis without a fresh
-            //    getUserMedia prompt. wasMicActiveRef remembers the prior state.
-            //    CRITICAL: use teardownMicCapture (NOT stopMic) here — stopMic
-            //    marks the stop as "intentional" and would wipe wasMicActiveRef,
-            //    so resumeAfterThreat could never know the mic must restart
-            //    (this was the root cause of the "dead after first popup" bug).
-            wasMicActiveRef.current = isMicActiveRef.current;
-            if (teardownMicCaptureRef.current) teardownMicCaptureRef.current();
-
-            // 3. Immediately reset backend audio buffer and threat aggregator
-            sendCommand('RESET_BUFFER');
-
-            // 4. Immediately clear client audio buffers and visualizations
-            audioStreamBufferRef.current = new Float32Array(0);
+            setIsFrozen(false);
+            setSmoothedRisk(0.0);
+            setInstantRisk(0.0);
+            setStatus('IDLE_SILENCE');
+            setLabel('MONITORING - AWAITING SPEECH');
+            setColor('slate');
+            setAnomalies([]);
+            setForensics(null);
             setWaveform([]);
             setSpectral([]);
-            setIsFrozen(true);
+            setActiveChallenge(null);
+          } else if (data.type === 'TELEMETRY') {
+            if (isResettingRef.current) return;
+
+            setSmoothedRisk(data.smoothed_risk);
+            setInstantRisk(data.instant_risk);
+            setStatus(data.status);
+            setLabel(data.label);
+            setColor(data.color);
+            setAnomalies(data.anomalies || []);
+            setForensics(data.forensics);
+            setLatencyMs(data.latency_ms);
+            if (data.waveform_preview && data.waveform_preview.length > 0) {
+              setWaveform(data.waveform_preview);
+            }
+            if (data.spectral_preview && data.spectral_preview.length > 0) {
+              setSpectral(data.spectral_preview);
+            }
+
+            if (data.is_frozen !== undefined) setIsFrozen(Boolean(data.is_frozen));
+
+            // Verified synthetic voice attacks trigger advisory
+            const isFishy = Boolean(
+              (data.challenge && data.smoothed_risk >= 70.0) ||
+              (data.status === 'CRITICAL_SYNTHETIC' && data.smoothed_risk >= 75.0)
+            );
+
+            if (isFishy && !hasAlertedRef.current && !isResettingRef.current) {
+              hasAlertedRef.current = true;
+              if (data.challenge) setActiveChallenge(data.challenge);
+
+              if (onThreatDetectedRef.current) onThreatDetectedRef.current(data);
+
+              wasMicActiveRef.current = isMicActiveRef.current;
+              if (stopMicRef.current) stopMicRef.current(false);
+
+              sendCommand('RESET_BUFFER');
+              audioStreamBufferRef.current = new Float32Array(0);
+              setIsFrozen(true);
+            }
           }
+        } catch (e) {
+          console.error('Error parsing telemetry frame:', e);
         }
-      } catch (e) {
-        console.error('Error parsing telemetry frame:', e);
-      }
-    };
+      };
 
-    ws.onclose = () => {
-      if (pingTimerRef.current) {
-        clearInterval(pingTimerRef.current);
-        pingTimerRef.current = null;
-      }
-      setIsConnected(false);
-      setTimeout(connectWebSocket, 2000);
-    };
+      ws.onclose = () => {
+        if (pingTimerRef.current) {
+          clearInterval(pingTimerRef.current);
+          pingTimerRef.current = null;
+        }
+        setIsConnected(false);
+        setTimeout(connectWebSocket, 2000);
+      };
 
-    ws.onerror = (err) => console.error('WebSocket encountered error:', err);
-    wsRef.current = ws;
+      ws.onerror = (err) => console.error('WebSocket encountered error:', err);
+      wsRef.current = ws;
+    } catch (e) {
+      console.error('WebSocket connection initialization error:', e);
+      setTimeout(connectWebSocket, 3000);
+    }
   }, []);
 
   useEffect(() => {
@@ -225,13 +208,14 @@ export default function useAegisStream({ onThreatDetected, onMicError }) {
 
   // ---------------- Microphone capture ----------------
   const getAudioContext = useCallback(async () => {
-    if (!audioContextRef.current) {
+    if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       const ctx = new AudioCtx();
       ctx.onstatechange = () => {
         if (ctx.state === 'suspended') ctx.resume().catch(() => {});
       };
       audioContextRef.current = ctx;
+      workletRegisteredRef.current = false;
     }
     const ctx = audioContextRef.current;
     if (ctx.state === 'suspended') await ctx.resume().catch(() => {});
@@ -286,11 +270,11 @@ export default function useAegisStream({ onThreatDetected, onMicError }) {
       sendAudioChunk(int16Array.buffer);
       offset += CHUNK_SIZE;
     }
-    // Immediate visual feedback on client oscilloscope
+
     if (pcm16k.length > 0) {
-      const step = Math.max(1, Math.floor(pcm16k.length / 128));
+      const step = Math.max(1, Math.floor(pcm16k.length / 64));
       const preview = [];
-      for (let i = 0; i < pcm16k.length && preview.length < 128; i += step) {
+      for (let i = 0; i < pcm16k.length && preview.length < 64; i += step) {
         preview.push(pcm16k[i]);
       }
       setWaveform(preview);
@@ -300,50 +284,57 @@ export default function useAegisStream({ onThreatDetected, onMicError }) {
   }, [sendAudioChunk]);
 
   /**
-   * Tear down mic capture nodes WITHOUT touching resume-intent state.
-   * Used by both stopMic (intentional stop) and the threat pause (temporary).
+   * Complete clean teardown of mic hardware and audio context nodes.
+   * Completely avoids Chrome/macOS dead hardware pump lockups on repeated start/stops.
    */
-  const teardownMicCapture = useCallback(() => {
+  const teardownMicCapture = useCallback(async (intentional = true) => {
     if (micStreamRef.current) {
-      micStreamRef.current.getTracks().forEach((t) => {
-        t.stop();
-        t.enabled = false;
-      });
+      try {
+        micStreamRef.current.getTracks().forEach((t) => {
+          t.stop();
+          t.enabled = false;
+        });
+      } catch (e) {}
       micStreamRef.current = null;
     }
+
+    if (micSourceRef.current) {
+      try {
+        micSourceRef.current.disconnect();
+      } catch (e) {}
+      micSourceRef.current = null;
+    }
+
     if (micProcessorRef.current) {
-      micProcessorRef.current.disconnect();
+      try {
+        micProcessorRef.current.disconnect();
+      } catch (e) {}
       micProcessorRef.current = null;
     }
+
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      try {
+        await audioContextRef.current.close();
+      } catch (e) {}
+      audioContextRef.current = null;
+      workletRegisteredRef.current = false;
+    }
+
     window.__activeMicProcessor = null;
     audioStreamBufferRef.current = new Float32Array(0);
     setIsMicActive(false);
+    if (intentional) {
+      wasMicActiveRef.current = false;
+    }
   }, []);
-  teardownMicCaptureRef.current = teardownMicCapture;
 
-  const stopMic = useCallback(() => {
-    teardownMicCapture();
-    wasMicActiveRef.current = false; // intentional stop — do not auto-resume later
+  const stopMic = useCallback((intentional = true) => {
+    teardownMicCapture(intentional);
   }, [teardownMicCapture]);
   stopMicRef.current = stopMic;
 
-  /**
-   * Failsafe: if the backend RESET_ACK is lost (WS reconnect race), the latch
-   * must never wedge — telemetry would be dropped forever and the alert
-   * trigger would stay disarmed. RESET_ACK clears both earlier when it does
-   * arrive; this timer is pure insurance.
-   */
-  const armLatchFailsafe = useCallback(() => {
-    setTimeout(() => {
-      isResettingRef.current = false;
-      hasAlertedRef.current = false;
-    }, 1500);
-  }, []);
-
   const handleResetBuffer = useCallback(() => {
-    isResettingRef.current = true;
-    sendCommand('RESET_BUFFER');
-    armLatchFailsafe();
+    isResettingRef.current = false;
     hasAlertedRef.current = false;
     setIsFrozen(false);
     setActiveChallenge(null);
@@ -357,34 +348,15 @@ export default function useAegisStream({ onThreatDetected, onMicError }) {
     setWaveform([]);
     setSpectral([]);
     audioStreamBufferRef.current = new Float32Array(0);
-    if (stopMicRef.current) stopMicRef.current();
+    sendCommand('RESET_BUFFER');
   }, [sendCommand]);
 
   const startMic = useCallback(async () => {
     try {
-      // 1. Engage reset latch so any residual in-flight frames are safely dropped
-      isResettingRef.current = true;
-      hasAlertedRef.current = true;
+      // 1. Flush any prior state and unfreeze
+      handleResetBuffer();
 
-      // 2. Command backend to flush any residue from prior sessions
-      sendCommand('RESET_BUFFER');
-      armLatchFailsafe();
-
-      // 3. Reset frontend telemetry state to fresh monitoring baseline
-      setSmoothedRisk(0.0);
-      setInstantRisk(0.0);
-      setStatus('IDLE_SILENCE');
-      setLabel('MONITORING - AWAITING SPEECH');
-      setColor('slate');
-      setAnomalies([]);
-      setForensics(null);
-      setWaveform([]);
-      setSpectral([]);
-      setIsFrozen(false);
-      setActiveChallenge(null);
-      audioStreamBufferRef.current = new Float32Array(0);
-
-      // 4. Request microphone hardware stream with browser noise suppression enabled
+      // 2. Request fresh microphone hardware stream
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           channelCount: 1,
@@ -400,6 +372,7 @@ export default function useAegisStream({ onThreatDetected, onMicError }) {
         await audioCtx.resume().catch(() => {});
       }
       const source = audioCtx.createMediaStreamSource(stream);
+      micSourceRef.current = source;
 
       if (workletRegisteredRef.current) {
         const workletNode = new AudioWorkletNode(audioCtx, 'continuous-audio-processor');
@@ -425,45 +398,124 @@ export default function useAegisStream({ onThreatDetected, onMicError }) {
         processor.connect(silentGain);
         silentGain.connect(audioCtx.destination);
       }
+
       setIsMicActive(true);
+      isResettingRef.current = false;
+      hasAlertedRef.current = false;
     } catch (err) {
       console.error('Error opening microphone:', err);
       if (onMicErrorRef.current) onMicErrorRef.current(err);
+      teardownMicCapture(true);
     }
-  }, [getAudioContext, sendAudioData, sendCommand, armLatchFailsafe]);
+  }, [getAudioContext, sendAudioData, handleResetBuffer, teardownMicCapture]);
 
   /**
    * Resume realtime analysis after a threat advisory is dismissed.
-   * Fixes the "one popup, then dead" bug: clears the reset latch, resets
-   * telemetry, restarts mic capture, and re-arms the threat trigger.
    */
   const resumeAfterThreat = useCallback(async () => {
-    // NOTE: isResettingRef stays TRUE until RESET_ACK arrives — pre-reset
-    // telemetry frames (FIFO) are then dropped, so a stale CRITICAL frame can
-    // never re-trigger the modal. hasAlertedRef is re-armed by RESET_ACK's
-    // 800ms stabilization timer (and by the failsafe if the ACK is lost).
-
-    // 2. Flush backend buffers + aggregator and get a clean RESET_ACK baseline
-    sendCommand('RESET_BUFFER');
-    armLatchFailsafe();
-
-    // 3. Restart mic if it was active before the threat pause (fresh capture,
-    //    no new permission prompt since context + worklet are still registered).
-    //    Read the live ref, not the state snapshot — after the pause teardown,
-    //    the isMicActive STATE is false but wasMicActiveRef holds the truth.
-    if (wasMicActiveRef.current || isMicActiveRef.current) {
+    handleResetBuffer();
+    if (wasMicActiveRef.current) {
       await startMic();
     }
-  }, [sendCommand, startMic, armLatchFailsafe]);
+  }, [handleResetBuffer, startMic]);
 
   const handleToggleMic = useCallback(() => {
     if (isMicActive) {
-      stopMic();
+      stopMic(true);
       handleResetBuffer();
     } else {
+      if (isPlayingSample) stopSample();
       startMic();
     }
-  }, [isMicActive, stopMic, handleResetBuffer, startMic]);
+  }, [isMicActive, stopMic, handleResetBuffer, startMic, isPlayingSample]);
+
+  // ---------------- Sample Playback & Benchmark Feeder ----------------
+  const stopSample = useCallback(() => {
+    if (sampleIntervalRef.current) {
+      clearInterval(sampleIntervalRef.current);
+      sampleIntervalRef.current = null;
+    }
+    setIsPlayingSample(false);
+    setCurrentSampleId(null);
+    audioStreamBufferRef.current = new Float32Array(0);
+    setWaveform([]);
+  }, []);
+
+  const playSample = useCallback(async (sample) => {
+    stopMic(true);
+    stopSample();
+    handleResetBuffer();
+
+    const sampleId = typeof sample === 'string' ? sample : sample.id;
+    const filename = typeof sample === 'object' && sample.filename ? sample.filename : `${sampleId}.wav`;
+    const url = apiUrl(`/api/audio/${filename}`);
+
+    setIsPlayingSample(true);
+    setCurrentSampleId(sampleId);
+
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) {
+        throw new Error(`Failed to load audio sample ${filename} (HTTP ${resp.status})`);
+      }
+      const arrayBuffer = await resp.arrayBuffer();
+
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      const decodeCtx = new AudioCtx();
+      const decodedBuffer = await decodeCtx.decodeAudioData(arrayBuffer);
+      await decodeCtx.close();
+
+      const rawData = decodedBuffer.getChannelData(0);
+      const srcRate = decodedBuffer.sampleRate;
+
+      // Resample to 16,000 Hz for the detection pipeline
+      let pcm16k;
+      if (srcRate === 16000) {
+        pcm16k = rawData;
+      } else {
+        const ratio = srcRate / 16000;
+        const targetLen = Math.floor(rawData.length / ratio);
+        pcm16k = new Float32Array(targetLen);
+        for (let j = 0; j < targetLen; j++) {
+          const srcIdx = j * ratio;
+          const idx0 = Math.floor(srcIdx);
+          const idx1 = Math.min(idx0 + 1, rawData.length - 1);
+          const frac = srcIdx - idx0;
+          pcm16k[j] = (1 - frac) * rawData[idx0] + frac * rawData[idx1];
+        }
+      }
+
+      // Stream 2048-sample chunks (~128ms) into WebSocket pipeline in real-time
+      const CHUNK_SIZE = 2048;
+      let offset = 0;
+      sampleIntervalRef.current = setInterval(() => {
+        if (offset >= pcm16k.length) {
+          stopSample();
+          return;
+        }
+        const slice = pcm16k.subarray(offset, Math.min(pcm16k.length, offset + CHUNK_SIZE));
+        const int16Array = new Int16Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+          const s = Math.max(-1, Math.min(1, slice[i]));
+          int16Array[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+        }
+        sendAudioChunk(int16Array.buffer);
+
+        // Feed waveform preview
+        const step = Math.max(1, Math.floor(slice.length / 64));
+        const preview = [];
+        for (let i = 0; i < slice.length && preview.length < 64; i += step) {
+          preview.push(slice[i]);
+        }
+        setWaveform(preview);
+
+        offset += CHUNK_SIZE;
+      }, 128);
+    } catch (err) {
+      console.error('Error playing sample:', err);
+      stopSample();
+    }
+  }, [stopMic, stopSample, handleResetBuffer, sendAudioChunk]);
 
   // ---------------- Session controls ----------------
   const handleToggleTelephony = useCallback(() => {
@@ -475,13 +527,11 @@ export default function useAegisStream({ onThreatDetected, onMicError }) {
   }, [sendCommand]);
 
   return {
-    // connection & telemetry
     isConnected, sessionId, smoothedRisk, instantRisk, status, label, color,
     anomalies, forensics, latencyMs, waveform, spectral,
-    // prevention
     isFrozen, activeChallenge, setActiveChallenge,
-    // mic & controls
-    isMicActive, handleToggleMic, stopMic, stopMicRef, startMic, resumeAfterThreat,
+    isMicActive, handleToggleMic, stopMic, startMic, resumeAfterThreat,
+    isPlayingSample, currentSampleId, playSample, stopSample,
     telephonyMode, handleToggleTelephony, handleResetBuffer,
     wsRef,
   };
