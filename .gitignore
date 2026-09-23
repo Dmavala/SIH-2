@@ -32,9 +32,11 @@ voice_cloning_detector/checkpoints/
 *.zip
 
 # Local SQLite databases
-backend/data/*.db
-backend/data/*.sqlite
-backend/data/*.sqlite3
+*.db
+*.sqlite
+*.sqlite3
+data/
+backend/data/
 
 # Node & Frontend
 frontend/node_modules/

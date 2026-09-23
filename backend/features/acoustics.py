@@ -107,25 +107,27 @@ def extract_acoustic_forensics(waveform: np.ndarray, sample_rate: int = 16000) -
             pitch_track.append(f0)
             frame_amps.append(np.max(np.abs(chunk)))
 
-    pitch_arr = np.array(pitch_track) if len(pitch_track) > 0 else np.array([120.0])
-    pitch_mean = float(np.mean(pitch_arr))
-    pitch_std = float(np.std(pitch_arr))
-
-    # Jitter (cycle-to-cycle F0 perturbation: human 0.6% - 2.5%, TTS < 0.35%)
-    if len(pitch_arr) >= 3:
-        periods = 1.0 / pitch_arr
-        period_diffs = np.abs(np.diff(periods))
-        jitter_local = float(np.mean(period_diffs) / (np.mean(periods) + 1e-6))
+    if len(pitch_track) > 0:
+        pitch_arr = np.array(pitch_track)
+        pitch_mean = float(np.mean(pitch_arr))
+        pitch_std = float(np.std(pitch_arr))
+        if len(pitch_arr) >= 3:
+            periods = 1.0 / pitch_arr
+            period_diffs = np.abs(np.diff(periods))
+            jitter_local = float(np.mean(period_diffs) / (np.mean(periods) + 1e-6))
+        else:
+            jitter_local = 0.012
+        if len(frame_amps) >= 3:
+            amp_arr = np.array(frame_amps)
+            amp_diffs = np.abs(np.diff(amp_arr))
+            shimmer_local = float(np.mean(amp_diffs) / (np.mean(amp_arr) + 1e-6))
+        else:
+            shimmer_local = 0.030
     else:
-        jitter_local = 0.012
-
-    # Shimmer (amplitude perturbation: human 2% - 6%, synthetic < 1.5%)
-    if len(frame_amps) >= 3:
-        amp_arr = np.array(frame_amps)
-        amp_diffs = np.abs(np.diff(amp_arr))
-        shimmer_local = float(np.mean(amp_diffs) / (np.mean(amp_arr) + 1e-6))
-    else:
-        shimmer_local = 0.030
+        pitch_mean = 0.0
+        pitch_std = 0.0
+        jitter_local = 0.0
+        shimmer_local = 0.0
 
     # 2. High-Frequency Vocoder Phase & Spectral Roughness
     phase_dispersion = compute_spectral_phase_coherence(norm_audio, sample_rate)

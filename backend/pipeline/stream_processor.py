@@ -11,6 +11,7 @@ import numpy as np
 import time
 from typing import Dict, Any, Optional
 
+from backend.config import settings
 from backend.models.detector import DeepfakeDetector
 from backend.pipeline.prevention import ThreatAggregator, PreventionManager
 
@@ -42,7 +43,10 @@ class StreamProcessor:
         self.total_samples_received = 0
 
         self.detector = detector if detector is not None else DeepfakeDetector()
-        self.threat_aggregator = ThreatAggregator(window_size=4, threshold_critical=80.0)
+        self.threat_aggregator = ThreatAggregator(
+            window_size=settings.prevention.threat_window,
+            threshold_critical=settings.prevention.threat_threshold_critical,
+        )
         self.is_frozen = False
         self.challenge_triggered = False
 
@@ -54,7 +58,7 @@ class StreamProcessor:
         if len(pcm_bytes) == 0:
             return None
 
-        # Determine format (int16 is 2 bytes per sample, float32 is 4 bytes)
+        # Standard WebSocket input is Int16Array from AudioWorklet
         if len(pcm_bytes) % 2 == 0:
             int16_data = np.frombuffer(pcm_bytes, dtype=np.int16)
             float_data = int16_data.astype(np.float32) / 32768.0
@@ -82,10 +86,11 @@ class StreamProcessor:
             self.audio_buffer = np.roll(self.audio_buffer, -n)
             self.audio_buffer[-n:] = samples
 
-        # Check if hop interval reached and at least 1 second received
+        # Check if hop interval reached and at least 1.5 seconds of audio received
         if self.samples_since_last_eval >= self.hop_samples:
-            self.samples_since_last_eval = 0
-            if self.total_samples_received < self.sample_rate:
+            # Subtract hop_samples to preserve remainder and avoid phase drift
+            self.samples_since_last_eval -= self.hop_samples
+            if self.total_samples_received < int(1.5 * self.sample_rate):
                 return None
             return self.process_current_window()
 
@@ -108,13 +113,46 @@ class StreamProcessor:
 
         # Smooth threat score across temporal window
         instant_risk = analysis["risk_score"]
-        is_idle = (analysis["status"] == "IDLE_SILENCE")
+        is_idle = analysis.get("is_idle", (analysis["status"] == "IDLE_SILENCE"))
         smoothed_risk = self.threat_aggregator.update(instant_risk, is_idle=is_idle)
         analysis["smoothed_risk"] = smoothed_risk
 
-        # In-Call Prevention Trigger (Sustained synthetic detection or instant high threat)
+        # If call is in pause but ongoing held threat exists, maintain alert posture
+        if is_idle:
+            if smoothed_risk >= settings.risk.critical:
+                analysis["status"] = "CRITICAL_SYNTHETIC"
+                analysis["label"] = "SYNTHETIC VOICE DETECTED (HELD THREAT STATE)"
+                analysis["color"] = "red"
+            elif smoothed_risk >= settings.risk.suspicious and analysis.get("status") == "SUSPICIOUS_ANOMALY":
+                analysis["status"] = "SUSPICIOUS_ANOMALY"
+                analysis["label"] = "SUSPICIOUS ACOUSTIC ANOMALIES (HELD STATE)"
+                analysis["color"] = "amber"
+            else:
+                analysis["status"] = "IDLE_SILENCE"
+                analysis["label"] = "IDLE / SILENCE (AWAITING SPEECH)"
+                analysis["color"] = "slate"
+
+        # In-Call Prevention Trigger (Sustained synthetic detection).
+        # Gate: only decisive CRITICAL verdicts auto-trigger — an INCONCLUSIVE
+        # (disagreeing engines / gray zone) must escalate to a human, not freeze the line.
+        # Crucially, require sustained temporal history (at least 3 frames, ~1.5s)
+        # to ensure an opening transient or ambient noise never freezes the call.
         challenge_info = None
-        should_trigger = (smoothed_risk >= 75.0) or (instant_risk >= 88.0 and smoothed_risk >= 50.0)
+        is_critical = analysis["status"] == "CRITICAL_SYNTHETIC"
+
+        # Unfreeze when the caller passed the out-of-band challenge, and re-arm
+        # the latch so a NEW sustained attack can trigger a fresh challenge.
+        session_challenge = self.prevention_manager.active_challenges.get(self.session_id)
+        if session_challenge and session_challenge.get("status") in ("PASSED", "DISMISSED"):
+            if self.is_frozen or self.challenge_triggered:
+                self.is_frozen = False
+                self.challenge_triggered = False
+
+        has_sustained_history = len(self.threat_aggregator.history) >= 3
+        should_trigger = is_critical and has_sustained_history and (
+            (smoothed_risk >= settings.risk.challenge_smoothed)
+            or (instant_risk >= settings.risk.challenge_instant and smoothed_risk >= settings.risk.challenge_instant_floor)
+        )
         if should_trigger and not self.challenge_triggered:
             self.challenge_triggered = True
             self.is_frozen = True
@@ -141,6 +179,7 @@ class StreamProcessor:
             "status": analysis["status"],
             "label": analysis["label"],
             "color": analysis["color"],
+            "is_idle": is_idle,
             "anomalies": analysis["anomalies"],
             "forensics": analysis["forensics"],
             "latency_ms": analysis["latency_ms"],
@@ -153,3 +192,14 @@ class StreamProcessor:
 
     def set_telephony_mode(self, enabled: bool):
         self.telephony_mode = enabled
+
+    def reset(self):
+        """Cleans entire session buffer state."""
+        self.audio_buffer.fill(0.0)
+        self.samples_since_last_eval = 0
+        self.total_samples_received = 0
+        self.is_frozen = False
+        self.challenge_triggered = False
+        self.threat_aggregator.reset()
+        if hasattr(self, 'prevention_manager') and self.prevention_manager:
+            self.prevention_manager.resolve_challenge(self.session_id)

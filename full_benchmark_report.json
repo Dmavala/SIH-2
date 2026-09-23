@@ -1,0 +1,1406 @@
+{
+  "generated_at": "2026-09-22T11:15:32",
+  "machine_note": "Measured on the deployment machine; CPU-only inference.",
+  "engine": {
+    "model_type": "aasist",
+    "aasist_loaded": true,
+    "rawnet_loaded": true
+  },
+  "dataset": {
+    "roots": [
+      "large_benchmark_data",
+      "test_realworld_samples",
+      "scam_call_data"
+    ],
+    "files_total": 167,
+    "files_evaluable": 167,
+    "real_clips": 100,
+    "fake_clips": 67
+  },
+  "safety_properties": {
+    "real_audio_auto_flagged": 1,
+    "attacks_passing_as_authentic": 0,
+    "crisp_verdicts": 91,
+    "crisp_and_correct": 90,
+    "escalations_to_review": 76
+  },
+  "risk_stats": {
+    "real_mean": 27.95,
+    "real_max": 82.3,
+    "fake_mean": 82.46,
+    "fake_min": 44.4
+  },
+  "file_analysis_latency_ms": {
+    "note": "Wall time to fully analyse one file (all 2s windows + consensus). NOT the stream per-frame latency, which is much lower.",
+    "mean": 243.72,
+    "p95": 264.7,
+    "max": 348.8,
+    "files_measured": 167
+  },
+  "verdict_counts": {
+    "CRITICAL_SYNTHETIC": 50,
+    "INCONCLUSIVE": 76,
+    "AUTHENTIC_HUMAN": 41
+  },
+  "per_dataset": {
+    "large_benchmark_data": {
+      "verdict_counts": {
+        "CRITICAL_SYNTHETIC": 43,
+        "INCONCLUSIVE": 50,
+        "AUTHENTIC_HUMAN": 27
+      }
+    },
+    "test_realworld_samples": {
+      "verdict_counts": {
+        "CRITICAL_SYNTHETIC": 6,
+        "INCONCLUSIVE": 2,
+        "AUTHENTIC_HUMAN": 1
+      }
+    },
+    "scam_call_data": {
+      "verdict_counts": {
+        "AUTHENTIC_HUMAN": 13,
+        "INCONCLUSIVE": 24,
+        "CRITICAL_SYNTHETIC": 1
+      }
+    }
+  },
+  "results": [
+    {
+      "file": "large_benchmark_data\\fake\\el_0001_c_part_002.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 96.9,
+      "latency_ms": 266.92
+    },
+    {
+      "file": "large_benchmark_data\\fake\\el_0001_c_part_003.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 92.2,
+      "latency_ms": 228.76
+    },
+    {
+      "file": "large_benchmark_data\\fake\\el_0001_c_part_004.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 96.2,
+      "latency_ms": 228.75
+    },
+    {
+      "file": "large_benchmark_data\\fake\\el_0001_c_part_005.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 93.1,
+      "latency_ms": 246.03
+    },
+    {
+      "file": "large_benchmark_data\\fake\\el_0001_part_001.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 92.1,
+      "latency_ms": 241.65
+    },
+    {
+      "file": "large_benchmark_data\\fake\\el_0002_c_part_001.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 83.0,
+      "latency_ms": 241.09
+    },
+    {
+      "file": "large_benchmark_data\\fake\\el_0003_c_part_004.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 70.8,
+      "latency_ms": 233.62
+    },
+    {
+      "file": "large_benchmark_data\\fake\\el_0003_part_001.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 75.5,
+      "latency_ms": 238.19
+    },
+    {
+      "file": "large_benchmark_data\\fake\\el_0003_part_002.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 83.5,
+      "latency_ms": 237.03
+    },
+    {
+      "file": "large_benchmark_data\\fake\\el_0003_part_003.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 88.3,
+      "latency_ms": 246.26
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hg_0001_c_part_005.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 91.2,
+      "latency_ms": 230.21
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hg_0001_part_001.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 64.7,
+      "latency_ms": 240.42
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hg_0001_part_002.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 74.1,
+      "latency_ms": 228.63
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hg_0001_part_003.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 81.9,
+      "latency_ms": 226.46
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hg_0001_part_004.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 83.9,
+      "latency_ms": 246.9
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hg_0002_c_part_006.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 90.4,
+      "latency_ms": 250.16
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hg_0002_part_001.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 56.3,
+      "latency_ms": 241.54
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hg_0002_part_002.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 81.7,
+      "latency_ms": 256.31
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hg_0002_part_003.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 81.3,
+      "latency_ms": 232.73
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hg_0002_part_004.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 44.4,
+      "latency_ms": 215.6
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hu_0001_c_part_012.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 80.3,
+      "latency_ms": 240.18
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hu_0001_c_part_013.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 82.6,
+      "latency_ms": 243.31
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hu_0001_c_part_014.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 92.6,
+      "latency_ms": 243.55
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hu_0001_c_part_015.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 87.3,
+      "latency_ms": 228.01
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hu_0001_part_001.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 93.0,
+      "latency_ms": 238.34
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hu_0001_part_002.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 77.3,
+      "latency_ms": 237.73
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hu_0001_part_003.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 88.1,
+      "latency_ms": 242.21
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hu_0001_part_004.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 88.1,
+      "latency_ms": 225.89
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hu_0001_part_005.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 92.6,
+      "latency_ms": 243.86
+    },
+    {
+      "file": "large_benchmark_data\\fake\\hu_0001_part_006.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 88.9,
+      "latency_ms": 232.89
+    },
+    {
+      "file": "large_benchmark_data\\fake\\lv_0001_c_part_018.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 85.2,
+      "latency_ms": 245.72
+    },
+    {
+      "file": "large_benchmark_data\\fake\\lv_0001_c_part_019.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 88.3,
+      "latency_ms": 238.58
+    },
+    {
+      "file": "large_benchmark_data\\fake\\lv_0001_c_part_020.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 80.8,
+      "latency_ms": 245.48
+    },
+    {
+      "file": "large_benchmark_data\\fake\\lv_0001_c_part_021.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 77.2,
+      "latency_ms": 228.07
+    },
+    {
+      "file": "large_benchmark_data\\fake\\lv_0001_c_part_022.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 87.1,
+      "latency_ms": 235.21
+    },
+    {
+      "file": "large_benchmark_data\\fake\\lv_0001_c_part_023.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 70.7,
+      "latency_ms": 249.75
+    },
+    {
+      "file": "large_benchmark_data\\fake\\lv_0001_c_part_024.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 82.7,
+      "latency_ms": 239.05
+    },
+    {
+      "file": "large_benchmark_data\\fake\\lv_0001_c_part_025.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 62.3,
+      "latency_ms": 245.27
+    },
+    {
+      "file": "large_benchmark_data\\fake\\lv_0001_c_part_026.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 89.2,
+      "latency_ms": 260.61
+    },
+    {
+      "file": "large_benchmark_data\\fake\\lv_0001_part_001.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 88.9,
+      "latency_ms": 242.99
+    },
+    {
+      "file": "large_benchmark_data\\fake\\po_0001_c_part_001.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 81.6,
+      "latency_ms": 230.36
+    },
+    {
+      "file": "large_benchmark_data\\fake\\po_0001_c_part_006.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 79.9,
+      "latency_ms": 233.06
+    },
+    {
+      "file": "large_benchmark_data\\fake\\po_0001_part_001.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 65.2,
+      "latency_ms": 237.53
+    },
+    {
+      "file": "large_benchmark_data\\fake\\po_0001_part_002.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 81.0,
+      "latency_ms": 246.1
+    },
+    {
+      "file": "large_benchmark_data\\fake\\po_0001_part_003.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 83.5,
+      "latency_ms": 260.41
+    },
+    {
+      "file": "large_benchmark_data\\fake\\po_0001_part_004.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 79.0,
+      "latency_ms": 235.29
+    },
+    {
+      "file": "large_benchmark_data\\fake\\po_0001_part_005.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 92.6,
+      "latency_ms": 247.85
+    },
+    {
+      "file": "large_benchmark_data\\fake\\po_0002_c_part_002.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 74.0,
+      "latency_ms": 237.08
+    },
+    {
+      "file": "large_benchmark_data\\fake\\po_0002_c_part_008.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 79.8,
+      "latency_ms": 241.04
+    },
+    {
+      "file": "large_benchmark_data\\fake\\po_0002_part_001.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 92.8,
+      "latency_ms": 240.13
+    },
+    {
+      "file": "large_benchmark_data\\fake\\sp_0001_c_part_006.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 79.9,
+      "latency_ms": 225.27
+    },
+    {
+      "file": "large_benchmark_data\\fake\\sp_0001_c_part_018.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 85.2,
+      "latency_ms": 244.5
+    },
+    {
+      "file": "large_benchmark_data\\fake\\sp_0001_c_part_019.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 88.3,
+      "latency_ms": 236.33
+    },
+    {
+      "file": "large_benchmark_data\\fake\\sp_0001_c_part_020.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 80.8,
+      "latency_ms": 248.34
+    },
+    {
+      "file": "large_benchmark_data\\fake\\sp_0001_c_part_021.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 77.2,
+      "latency_ms": 234.4
+    },
+    {
+      "file": "large_benchmark_data\\fake\\sp_0001_c_part_022.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 87.1,
+      "latency_ms": 251.29
+    },
+    {
+      "file": "large_benchmark_data\\fake\\sp_0001_c_part_023.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 70.7,
+      "latency_ms": 244.49
+    },
+    {
+      "file": "large_benchmark_data\\fake\\sp_0001_c_part_024.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 82.7,
+      "latency_ms": 242.91
+    },
+    {
+      "file": "large_benchmark_data\\fake\\sp_0001_c_part_025.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 62.3,
+      "latency_ms": 232.3
+    },
+    {
+      "file": "large_benchmark_data\\fake\\sp_0001_c_part_026.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 89.2,
+      "latency_ms": 242.21
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_p2_part_167.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 11.3,
+      "latency_ms": 240.88
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_001.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 25.8,
+      "latency_ms": 243.92
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_002.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 12.8,
+      "latency_ms": 254.79
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_003.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 27.8,
+      "latency_ms": 244.97
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_004.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 38.0,
+      "latency_ms": 249.11
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_005.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 49.2,
+      "latency_ms": 243.43
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_008.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 46.0,
+      "latency_ms": 231.19
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_010.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 16.3,
+      "latency_ms": 233.38
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_011.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 40.1,
+      "latency_ms": 245.49
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_013.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 8.6,
+      "latency_ms": 236.65
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_014.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 8.7,
+      "latency_ms": 244.43
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_015.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 21.8,
+      "latency_ms": 235.54
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_017.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 60.0,
+      "latency_ms": 241.12
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_019.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 39.5,
+      "latency_ms": 230.77
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_020.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 40.1,
+      "latency_ms": 232.65
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_021.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 13.8,
+      "latency_ms": 247.07
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_022.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 32.4,
+      "latency_ms": 238.31
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_024.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 27.6,
+      "latency_ms": 226.42
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_025.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 23.8,
+      "latency_ms": 242.79
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_026.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 8.0,
+      "latency_ms": 239.07
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_027.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 19.4,
+      "latency_ms": 227.96
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_028.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 25.6,
+      "latency_ms": 245.82
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_029.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 4.0,
+      "latency_ms": 239.77
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_030.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 20.8,
+      "latency_ms": 238.5
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_031.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 34.9,
+      "latency_ms": 243.54
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_033.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 24.1,
+      "latency_ms": 246.31
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_034.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 24.6,
+      "latency_ms": 230.2
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_035.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 52.9,
+      "latency_ms": 247.37
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_037.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 5.5,
+      "latency_ms": 242.12
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_038.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 39.8,
+      "latency_ms": 242.97
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_039.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 12.8,
+      "latency_ms": 233.84
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_042.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 32.1,
+      "latency_ms": 232.83
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_045.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 4.0,
+      "latency_ms": 241.52
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_046.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 36.9,
+      "latency_ms": 225.65
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_048.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 46.2,
+      "latency_ms": 240.03
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_050.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 41.4,
+      "latency_ms": 249.3
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_051.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 37.3,
+      "latency_ms": 250.04
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_052.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 21.6,
+      "latency_ms": 232.21
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_053.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 25.9,
+      "latency_ms": 251.52
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_055.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 19.8,
+      "latency_ms": 236.96
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_056.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 52.2,
+      "latency_ms": 234.11
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_059.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 17.7,
+      "latency_ms": 234.43
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_060.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 15.7,
+      "latency_ms": 237.54
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_061.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 39.7,
+      "latency_ms": 239.32
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_062.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 28.7,
+      "latency_ms": 250.05
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_063.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 23.4,
+      "latency_ms": 238.02
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_064.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 60.3,
+      "latency_ms": 252.39
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_065.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 41.5,
+      "latency_ms": 237.34
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_068.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 44.8,
+      "latency_ms": 253.19
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_069.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 27.2,
+      "latency_ms": 245.17
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_070.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 15.6,
+      "latency_ms": 236.38
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_073.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 43.7,
+      "latency_ms": 227.32
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_075.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 48.0,
+      "latency_ms": 238.11
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_076.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 27.0,
+      "latency_ms": 230.92
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_077.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 12.4,
+      "latency_ms": 243.09
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_079.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 33.2,
+      "latency_ms": 231.79
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_080.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 8.1,
+      "latency_ms": 240.05
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_082.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 22.0,
+      "latency_ms": 236.04
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_084.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 26.3,
+      "latency_ms": 247.75
+    },
+    {
+      "file": "large_benchmark_data\\real\\yt_0000_part_085.flac",
+      "dataset": "large_benchmark_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 9.3,
+      "latency_ms": 247.93
+    },
+    {
+      "file": "test_realworld_samples\\ai_elevenlabs_01.flac",
+      "dataset": "test_realworld_samples",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 96.9,
+      "latency_ms": 239.94
+    },
+    {
+      "file": "test_realworld_samples\\ai_elevenlabs_02.flac",
+      "dataset": "test_realworld_samples",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 92.1,
+      "latency_ms": 252.38
+    },
+    {
+      "file": "test_realworld_samples\\ai_hifigan_01.flac",
+      "dataset": "test_realworld_samples",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 91.2,
+      "latency_ms": 226.35
+    },
+    {
+      "file": "test_realworld_samples\\ai_hubert_vc_01.flac",
+      "dataset": "test_realworld_samples",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 80.3,
+      "latency_ms": 236.55
+    },
+    {
+      "file": "test_realworld_samples\\ai_lmnt_01.flac",
+      "dataset": "test_realworld_samples",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 85.2,
+      "latency_ms": 239.81
+    },
+    {
+      "file": "test_realworld_samples\\ai_playht_01.flac",
+      "dataset": "test_realworld_samples",
+      "ground_truth": "FAKE",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 81.6,
+      "latency_ms": 256.17
+    },
+    {
+      "file": "test_realworld_samples\\ai_speechify_01.flac",
+      "dataset": "test_realworld_samples",
+      "ground_truth": "FAKE",
+      "verdict": "INCONCLUSIVE",
+      "risk": 79.9,
+      "latency_ms": 247.08
+    },
+    {
+      "file": "test_realworld_samples\\real_human_yt_01.flac",
+      "dataset": "test_realworld_samples",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 25.8,
+      "latency_ms": 348.8
+    },
+    {
+      "file": "test_realworld_samples\\real_human_yt_02.flac",
+      "dataset": "test_realworld_samples",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 12.8,
+      "latency_ms": 232.82
+    },
+    {
+      "file": "scam_call_data\\NORMAL_CALLS\\normal_10.mp3",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 9.9,
+      "latency_ms": 241.46
+    },
+    {
+      "file": "scam_call_data\\NORMAL_CALLS\\normal_11.mp3",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 18.5,
+      "latency_ms": 211.74
+    },
+    {
+      "file": "scam_call_data\\NORMAL_CALLS\\normal_12.mp3",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 51.0,
+      "latency_ms": 254.89
+    },
+    {
+      "file": "scam_call_data\\NORMAL_CALLS\\normal_13.mp3",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 30.6,
+      "latency_ms": 244.53
+    },
+    {
+      "file": "scam_call_data\\NORMAL_CALLS\\normal_14.mp3",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 30.9,
+      "latency_ms": 237.97
+    },
+    {
+      "file": "scam_call_data\\NORMAL_CALLS\\normal_15.mp3",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 42.3,
+      "latency_ms": 223.0
+    },
+    {
+      "file": "scam_call_data\\NORMAL_CALLS\\normal_17.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 8.8,
+      "latency_ms": 251.82
+    },
+    {
+      "file": "scam_call_data\\NORMAL_CALLS\\normal_18.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 32.9,
+      "latency_ms": 262.61
+    },
+    {
+      "file": "scam_call_data\\NORMAL_CALLS\\normal_19.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 18.9,
+      "latency_ms": 252.97
+    },
+    {
+      "file": "scam_call_data\\NORMAL_CALLS\\normal_20.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 25.4,
+      "latency_ms": 260.58
+    },
+    {
+      "file": "scam_call_data\\NORMAL_CALLS\\normal_21.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 11.0,
+      "latency_ms": 257.95
+    },
+    {
+      "file": "scam_call_data\\NORMAL_CALLS\\normal_7.mp3",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 31.9,
+      "latency_ms": 243.93
+    },
+    {
+      "file": "scam_call_data\\NORMAL_CALLS\\normal_8.mp3",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 4.6,
+      "latency_ms": 245.42
+    },
+    {
+      "file": "scam_call_data\\NORMAL_CALLS\\normal_9.mp3",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 38.4,
+      "latency_ms": 259.58
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_1.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 40.9,
+      "latency_ms": 253.88
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_10.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 9.9,
+      "latency_ms": 267.49
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_11.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 18.5,
+      "latency_ms": 281.95
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_12.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 50.9,
+      "latency_ms": 259.08
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_13.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 30.6,
+      "latency_ms": 265.16
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_14.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 30.9,
+      "latency_ms": 253.69
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_15.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 42.3,
+      "latency_ms": 264.17
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_16.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 26.4,
+      "latency_ms": 265.4
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_17.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 8.8,
+      "latency_ms": 248.43
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_18.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 32.9,
+      "latency_ms": 267.01
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_19.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 19.2,
+      "latency_ms": 253.62
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_2.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 27.0,
+      "latency_ms": 245.79
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_20.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 25.4,
+      "latency_ms": 247.11
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_21.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 11.1,
+      "latency_ms": 252.2
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_22.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 34.3,
+      "latency_ms": 255.18
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_23.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 37.9,
+      "latency_ms": 247.45
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_24.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 13.4,
+      "latency_ms": 264.53
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_3.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 42.7,
+      "latency_ms": 249.78
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_4.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "CRITICAL_SYNTHETIC",
+      "risk": 82.3,
+      "latency_ms": 264.77
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_5.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 27.6,
+      "latency_ms": 247.48
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_6.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 35.9,
+      "latency_ms": 266.29
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_7.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 31.9,
+      "latency_ms": 250.6
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_8.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "AUTHENTIC_HUMAN",
+      "risk": 4.5,
+      "latency_ms": 245.72
+    },
+    {
+      "file": "scam_call_data\\processed\\normal\\normal_9.wav",
+      "dataset": "scam_call_data",
+      "ground_truth": "REAL",
+      "verdict": "INCONCLUSIVE",
+      "risk": 38.4,
+      "latency_ms": 260.58
+    }
+  ]
+}

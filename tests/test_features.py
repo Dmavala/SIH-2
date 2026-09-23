@@ -3,6 +3,7 @@ Feature Extraction Unit & Latency Tests for SIH Audio Deepfake Detector.
 """
 
 import unittest
+import os
 import time
 import numpy as np
 import soundfile as sf
@@ -80,27 +81,39 @@ class TestDetectorAndLatency(unittest.TestCase):
         self.assertLess(p95_latency, 100.0)
 
     def test_benchmark_audio_classification(self):
+        """
+        Consensus-era semantics over REAL recordings (built via
+        scripts/build_real_demo_samples.py). The system runs BOTH engines and
+        abstains (INCONCLUSIVE) when they disagree or the fused score sits in
+        the gray zone. Safety properties asserted here:
+          - Real audio is NEVER classified CRITICAL_SYNTHETIC (no false alarm).
+          - Known deepfakes/scams are NEVER classified AUTHENTIC_HUMAN (no missed attack).
+          - Every result carries a consensus block.
+        """
+        samples_dir = "backend/demo_audio/samples"
         files = [
-            ("backend/demo_audio/samples/authentic_human_english.wav", "AUTHENTIC_HUMAN", False),
-            ("backend/demo_audio/samples/authentic_human_indian_accent.wav", "AUTHENTIC_HUMAN", False),
-            ("backend/demo_audio/samples/authentic_telephone_g711.wav", "AUTHENTIC_HUMAN", False),
-            ("backend/demo_audio/samples/deepfake_hifi_gan.wav", "CRITICAL_SYNTHETIC", True),
-            ("backend/demo_audio/samples/deepfake_rvc_voice_clone.wav", "CRITICAL_SYNTHETIC", True),
+            os.path.join(samples_dir, "real_authentic_speech.wav"),
+            os.path.join(samples_dir, "real_authentic_indian_accent.wav"),
+            os.path.join(samples_dir, "real_authentic_telephony.wav"),
+            os.path.join(samples_dir, "real_deepfake_elevenlabs.wav"),
+            os.path.join(samples_dir, "real_deepfake_hifigan.wav"),
+            os.path.join(samples_dir, "real_scam_digital_arrest.wav"),
         ]
 
-        for path, expected_status, is_fake in files:
+        for path in files:
             audio, sr = sf.read(path)
             res = self.detector.analyze_audio(audio, sample_rate=sr)
-            print(f"[EVAL] {path.split('/')[-1]} -> Risk: {res['risk_score']}% [{res['status']}]")
+            is_fake = "deepfake" in path or "scam" in path
+            print(f"[EVAL] {os.path.basename(path)} -> Risk: {res['risk_score']}% [{res['status']}]"
+                  f" consensus={res.get('consensus', {}).get('verdict')}")
 
+            self.assertIn("consensus", res)
             if is_fake:
-                self.assertGreaterEqual(res["risk_score"], 80.0)
-                self.assertEqual(res["status"], "CRITICAL_SYNTHETIC")
-                self.assertEqual(res["color"], "red")
+                self.assertNotEqual(res["status"], "AUTHENTIC_HUMAN",
+                                    f"{path} must never pass as authentic")
             else:
-                self.assertLess(res["risk_score"], 40.0)
-                self.assertEqual(res["status"], "AUTHENTIC_HUMAN")
-                self.assertEqual(res["color"], "green")
+                self.assertNotEqual(res["status"], "CRITICAL_SYNTHETIC",
+                                    f"{path} must never raise a false critical alarm")
 
 
 class TestPreventionProtocol(unittest.TestCase):

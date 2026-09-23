@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-09-22T10:46:42",
+  "results": [
+    {
+      "endpoint": "GET /api/health",
+      "requests": 48,
+      "concurrency": 8,
+      "duration_s": 0.21,
+      "throughput_rps": 229.14,
+      "latency_ms": {
+        "p50": 15.7,
+        "p95": 127.4,
+        "p99": 129.4,
+        "max": 129.4,
+        "mean": 32.2
+      },
+      "status_codes": {
+        "200": 48
+      },
+      "errors": 0
+    },
+    {
+      "endpoint": "POST /api/analyze-file",
+      "requests": 48,
+      "concurrency": 8,
+      "duration_s": 117.26,
+      "throughput_rps": 0.41,
+      "latency_ms": {
+        "p50": 17200.2,
+        "p95": 29448.8,
+        "p99": 31602.2,
+        "max": 31602.2,
+        "mean": 18218.9
+      },
+      "status_codes": {
+        "200": 48
+      },
+      "errors": 0
+    }
+  ]
+}

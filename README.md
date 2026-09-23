@@ -8,18 +8,27 @@ app_port: 8000
 pinned: false
 ---
 
-# AEGIS VOICE-SENTINEL: Real-Time Audio Deepfake Detection & In-Call Prevention
+# AEGIS VOICE-SENTINEL: Real-Time Audio Deepfake Detection & In-Call Defense
+## National AI Audio Anti-Spoofing & Legal Forensic Platform for Government of India (MHA / I4C / DoT)
 
-**Smart India Hackathon (SIH) Real-Time AI Audio Defense Architecture**
+**Smart India Hackathon (SIH) — National Cybersecurity & Telephony Defense Architecture**
+
+> [!IMPORTANT]
+> **SIH Grand Finale Deliverables**:
+> - Complete Presentation Script, Defense Strategy & Jury Q&A Matrix: [`SIH_WINNING_PITCH_AND_ARCHITECTURE.md`](file:///c:/Users/CodeX/Desktop/SIH-2/SIH_WINNING_PITCH_AND_ARCHITECTURE.md)
+> - Court-Admissible Electronic Evidence Engine: **Section 63 of Bharatiya Sakshya Adhiniyam (BSA), 2023**
 
 ---
 
-## 1. Problem & Core Attack Anatomy
-Neural TTS and Voice Conversion (VC) algorithms (HiFi-GAN, MelGAN, XTTS-v2, RVC) leave subtle mathematical and physical traces that human ears overlook during voice calls:
-
-1. **Spectral & Phase Inconsistencies**: Neural vocoders synthesize phase artificially from mel-spectrograms, producing high-frequency phase dispersion and envelope ripples in the linear upper band ($3.5\text{ kHz} - 8.0\text{ kHz}$).
-2. **Acoustic & Prosodic Artifacts**: Synthetic models lack human vocal-fold micro-tremors (flat cycle-to-cycle F0 jitter $< 0.35\%$), exhibit constrained pitch variance, and miss natural respiratory micro-pauses at phrase boundaries.
-3. **Acoustic Environment Disconnect**: Generative speech is synthesized in digital vacuum, lacking ambient room reverberation (RT60) and physical microphone noise floors ($-30\text{ dB}$ to $-55\text{ dB}$ in real rooms vs. $<-70\text{ dB}$ pristine digital silence).
+## 1. Problem & Indian Threat Landscape
+In India, AI voice cloning has triggered an unprecedented surge in high-impact cybercrimes:
+1. **"Digital Arrest" Scams**: Cyber syndicates impersonating CBI, State Police, and Customs officers with synthetic voices to extort citizens.
+2. **Family Emergency / Ransom Clones**: High-fidelity clones synthesized from 3-second social media clips to stage fake accidents and abductions.
+3. **Banking KYC Expiry Phishing**: High-pressure automated voice calls claiming immediate account/debit card suspension.
+4. **Physical Vocoder Footprints**: Neural vocoders (HiFi-GAN, XTTS, ElevenLabs, RVC) leave unnatural mathematical signatures:
+   - Severe high-frequency phase dispersion ($3.5\text{ kHz} - 8.0\text{ kHz}$).
+   - Constrained pitch variance and flat vocal micro-jitter ($<0.35\%$).
+   - Pristine digital background vacuum ($<-70\text{ dB}$ vs $-35\text{ dB}$ to $-55\text{ dB}$ in authentic phone calls).
 
 ---
 
@@ -86,19 +95,28 @@ Neural TTS and Voice Conversion (VC) algorithms (HiFi-GAN, MelGAN, XTTS-v2, RVC)
 ## 4. Quick Start & Execution
 
 ### Prerequisites
-- Python 3.10+ (tested with Python 3.14 on macOS ARM64)
+- Python 3.10+
 - Node.js 18+ and npm
 
-### 1. Launch with One Command
+### 1. Configure (all values env-driven — nothing hardcoded)
+```bash
+cp .env.example .env   # defaults are fine for local dev
+```
+Every threshold (risk levels, OTP policy, CORS, auth, rate limits, DB path,
+consensus engine weights) is set via environment variables. See
+**docs/DEPLOYMENT.md** for the full government-deployment configuration and the
+honest readiness assessment.
+
+### 2. Launch with One Command
 ```bash
 ./start.sh
 ```
 This runs the FastAPI backend engine and serves the modern React operator dashboard unified on **`http://localhost:8000`**.
 
-### 2. Alternatively Run Components Separately
+### 3. Alternatively Run Components Separately
 **Backend:**
 ```bash
-python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
 
 **Frontend (Dev Mode with Hot Reload):**
@@ -106,6 +124,32 @@ python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 cd frontend
 npm run dev
 ```
+
+### 4. Run the Test Suite
+```bash
+python -m unittest discover -s tests   # 54 tests: security, evidence chain, consensus, API
+```
+
+### 5. Retrain on Real Data (recommended before any deployment claim)
+```bash
+python -m backend.training.train --data-dir large_benchmark_data,test_realworld_samples,scam_call_data --epochs 30
+python scripts/build_real_demo_samples.py   # rebuild REAL demo audio
+python scripts/run_full_evaluation.py       # honest benchmark -> full_benchmark_report.json
+python scripts/load_test.py                 # throughput/latency (server must be running)
+cat backend/models/training_meta.json       # honest training record (quote this in evaluations)
+```
+
+**Current verified behaviour** (167 real in-repo clips, `full_benchmark_report.json`):
+0 deepfakes pass as authentic, 1/167 real clips flagged (0.6% FPR), 91 crisp
+verdicts (90 correct), 76 escalated to human review. Stream-frame latency
+6.5 ms mean / 7.5 ms P95 on CPU.
+
+### Demo Samples Are Real Recordings
+The bundled demo WAVs are **real** human speech, real reported scam calls, and
+real output from ElevenLabs / Play.ht / HiFi-GAN (built by
+`scripts/build_real_demo_samples.py` from the in-repo corpora). The original
+procedurally-synthesized demo files were retired — they made "authentic human"
+demos literally synthetic.
 
 ---
 

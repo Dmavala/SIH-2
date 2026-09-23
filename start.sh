@@ -1,25 +1,24 @@
 #!/usr/bin/env bash
-# Real-Time Audio Deepfake Detection & In-Call Prevention System (SIH)
-# Launcher script
+# AEGIS Voice-Sentinel launcher — runs backend + serves built frontend on one port.
+# Configuration is env-driven: see .env.example (all values optional for dev).
 
 set -e
 
 PORT=${PORT:-8000}
-FRONTEND_PORT=${FRONTEND_PORT:-5173}
 
 echo "================================================================="
-echo "  AEGIS VOICE-SENTINEL: Audio Deepfake Detection & Defense (SIH) "
+echo "  AEGIS VOICE-SENTINEL: Audio Deepfake Detection & Defense"
 echo "================================================================="
-echo "Starting FastAPI Backend Engine on http://localhost:$PORT..."
-echo "Features: LFCC + High-Frequency Phase Analysis + CNN-BiLSTM"
-echo "Target Latency: < 50ms per frame | G.711 Telephony Codec Robust"
+echo "  Backend API + Dashboard : http://localhost:$PORT"
+echo "  Config                  : .env (see .env.example)"
+echo "  Tests                   : python -m unittest discover -s tests"
 echo "================================================================="
 
-# Check python demo samples exist, generate if needed
-if [ ! -f "backend/demo_audio/samples/authentic_human_english.wav" ]; then
-    echo "Generating demo audio benchmarks..."
-    python3 backend/demo_audio/generate_samples.py
+# Build the frontend once if the dashboard assets are missing
+if [ ! -f "frontend/dist/index.html" ]; then
+    echo "Frontend build not found — building dashboard..."
+    (cd frontend && npm ci && npm run build)
 fi
 
-# Run FastAPI backend (which also serves the frontend on http://localhost:8000)
-python3 -m uvicorn backend.main:app --host 0.0.0.0 --port $PORT --reload
+# Run the FastAPI backend (serves the built frontend from frontend/dist)
+exec python3 -m uvicorn backend.main:app --host 0.0.0.0 --port "$PORT"

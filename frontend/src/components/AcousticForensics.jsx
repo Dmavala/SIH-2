@@ -1,146 +1,139 @@
 import React from 'react';
-import { Mic, Radio, Volume2, Wind, Eye, Cpu } from 'lucide-react';
+import { Mic, Radio, Volume2, Wind, Eye, Cpu, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 export default function AcousticForensics({ forensics, latencyMs }) {
   if (!forensics) {
     return (
-      <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 text-center text-zinc-600 text-xs font-mono">
-        Awaiting audio stream to compute acoustic forensic parameters...
-      </div>
+      <section aria-labelledby="forensics-heading" className="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-500 text-sm shadow-sm">
+        <h2 id="forensics-heading" className="sr-only">Acoustic Forensic Indicators</h2>
+        <div className="flex flex-col items-center justify-center gap-3 py-6">
+          <Volume2 className="w-8 h-8 text-slate-400 animate-pulse" aria-hidden="true" />
+          <p className="m-0 font-medium text-slate-700">Awaiting audio stream to compute acoustic forensic parameters...</p>
+          <span className="text-xs text-slate-500">Play an audio sample or start the microphone to stream live biometric measurements</span>
+        </div>
+      </section>
     );
   }
 
   const {
-    pitch_mean,
-    pitch_std,
-    jitter_local,
-    phase_dispersion,
-    high_band_ratio,
-    breath_pause_ratio,
-    spectral_flatness,
-    ambient_noise_floor_db,
-    is_pristine_env,
+    pitch_mean = 0,
+    pitch_std = 0,
+    jitter_local = 0,
+    phase_dispersion = 0,
+    breath_pause_ratio = 0,
+    ambient_noise_floor_db = -90,
+    is_pristine_env = false,
   } = forensics;
 
   const isPhaseBad = phase_dispersion > 0.14;
   const isJitterFlat = pitch_mean > 60 && jitter_local < 0.0035;
   const isPitchFlat = pitch_mean > 60 && pitch_std < 5.0;
   const isPristine = is_pristine_env;
-  const isHighBandAbnormal = high_band_ratio > 0.20;
 
   const cards = [
     {
       title: 'Phase Dispersion',
-      sub: 'Harmonic Phase Coherence',
+      sub: 'Harmonic Coherence',
       value: phase_dispersion.toFixed(4),
       unit: 'rad²',
-      benchmark: 'Human: <0.10 | Vocoder: >0.15',
+      plainExplanation: 'Evaluates whether sound wave harmonics align organically or show neural vocoder phase tearing.',
+      benchmark: 'Organic: <0.10 | Synthetic: >0.14',
       isAnomalous: isPhaseBad,
       icon: Radio,
-      detail: isPhaseBad ? 'Synthetic vocoder phase perturbation detected' : 'Normal human vocal tract phase progression',
     },
     {
       title: 'Vocal Micro-Jitter',
-      sub: 'F0 Period Perturbation',
+      sub: 'Pitch Cycle Variation',
       value: (jitter_local * 100).toFixed(2),
       unit: '%',
-      benchmark: 'Human: 0.6% - 2.5% | TTS: <0.35%',
+      plainExplanation: 'Human vocal cords naturally vibrate with micro-variations; cloned speech is unnaturally steady.',
+      benchmark: 'Organic: 0.6% - 2.5% | AI TTS: <0.35%',
       isAnomalous: isJitterFlat,
       icon: Mic,
-      detail: isJitterFlat ? 'Invariable jitter; vocal fold tremors absent' : 'Human vocal fold micro-tremors verified',
     },
     {
       title: 'Pitch Variance (F0)',
-      sub: 'Prosodic Dynamic Range',
+      sub: 'Prosodic Cadence',
       value: pitch_std.toFixed(1),
       unit: 'Hz',
+      plainExplanation: 'Measures natural emotional inflection and melody across syllables.',
       benchmark: `Mean: ${pitch_mean.toFixed(0)}Hz | Std > 10Hz`,
       isAnomalous: isPitchFlat,
       icon: Volume2,
-      detail: isPitchFlat ? 'Quantized pitch contour typical of TTS model' : 'Natural human conversational prosody',
     },
     {
-      title: 'Acoustic Environment',
-      sub: 'Background Noise & Reverb',
+      title: 'Ambient Noise Floor',
+      sub: 'Room Acoustics',
       value: `${ambient_noise_floor_db.toFixed(1)}`,
       unit: 'dB',
-      benchmark: 'Mic: -30dB to -55dB | Vacuum: <-65dB',
+      plainExplanation: 'Real speech carries environmental reverberation; AI speech often emerges from sterile digital silence.',
+      benchmark: 'Room Ambience: -30 to -55 dB | Clean Studio: <-65 dB',
       isAnomalous: isPristine,
       icon: Wind,
-      detail: isPristine ? 'Synthetic digital vacuum; room reverb absent' : 'Natural room ambience & reverberation verified',
     },
     {
-      title: 'Respiratory Cadence',
-      sub: 'Breath & Micro-Pause Ratio',
+      title: 'Breath Pause Cadence',
+      sub: 'Respiratory Cadence',
       value: (breath_pause_ratio * 100).toFixed(1),
       unit: '%',
-      benchmark: 'Human: 8% - 35% pauses',
+      plainExplanation: 'Verifies normal human breathing pauses between sentences and clauses.',
+      benchmark: 'Human Cadence: 8% - 35%',
       isAnomalous: breath_pause_ratio < 0.04,
       icon: Eye,
-      detail: breath_pause_ratio < 0.04 ? 'Continuous speech lacking human respiratory pauses' : 'Natural respiratory inhalation pauses verified',
     },
     {
       title: 'Inference Latency',
-      sub: 'Chunk Pipeline Speed',
+      sub: 'Detection Speed',
       value: latencyMs > 0 ? latencyMs.toFixed(1) : '<25',
       unit: 'ms',
-      benchmark: 'Real-time threshold: <150 ms',
+      plainExplanation: 'Round-trip neural inference duration per audio analysis hop window.',
+      benchmark: 'Real-time requirement: < 100 ms',
       isAnomalous: latencyMs > 150,
       icon: Cpu,
-      detail: 'Per-500ms sliding chunk analysis',
     },
   ];
 
   return (
-    <div className="bg-zinc-950 border border-zinc-800/90 rounded-2xl p-5">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xs uppercase font-mono tracking-wider text-zinc-400 m-0">
-          Acoustic & Prosodic Forensics
+    <div aria-labelledby="forensics-heading" className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm transition-all w-full">
+      <div className="flex flex-col gap-1 mb-5 pb-4 border-b border-slate-100">
+        <h2 id="forensics-heading" className="text-base font-bold text-slate-900 m-0">
+          Acoustic Forensics
         </h2>
-        <span className="text-[10px] font-mono text-zinc-400 bg-zinc-900 border border-zinc-800 px-2.5 py-0.5 rounded-full">
-          BIOMETRIC SIGNALS
-        </span>
+        <p className="text-xs text-slate-500 m-0 font-medium">
+          Biomechanical vocal tract analysis
+        </p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {cards.map((card, idx) => {
-          const Icon = card.icon;
+      <div className="flex flex-col gap-3">
+        {cards.map((item, idx) => {
+          const Icon = item.icon;
           return (
             <div
               key={idx}
-              className={`p-3.5 rounded-xl border transition-all ${
-                card.isAnomalous
-                  ? 'bg-zinc-900 border-zinc-600 shadow-sm'
-                  : 'bg-zinc-900/40 border-zinc-800/80 hover:border-zinc-700'
+              className={`p-3 rounded-xl border flex items-center justify-between transition-all ${
+                item.isAnomalous
+                  ? 'bg-rose-50/80 border-rose-200'
+                  : 'bg-slate-50/80 border-slate-200'
               }`}
             >
-              <div className="flex items-start justify-between">
-                <div className="text-zinc-400 text-xs font-medium">
-                  <div>{card.title}</div>
-                  <div className="text-[10px] text-zinc-500 font-mono">{card.sub}</div>
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${item.isAnomalous ? 'bg-rose-100 text-rose-600' : 'bg-slate-200 text-slate-600'}`}>
+                  <Icon className="w-4 h-4" aria-hidden="true" />
                 </div>
-                <div
-                  className={`p-1 rounded-md ${
-                    card.isAnomalous ? 'bg-zinc-800 text-white' : 'bg-zinc-900 text-zinc-500'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-slate-900">{item.title}</span>
+                  <span className="text-xs font-semibold text-slate-500">{item.benchmark}</span>
                 </div>
               </div>
-
-              <div className="mt-3 flex items-baseline gap-1">
-                <span className="text-xl font-bold font-mono text-white">
-                  {card.value}
+              <div className="flex flex-col items-end">
+                <span className={`text-base font-extrabold ${item.isAnomalous ? 'text-rose-700' : 'text-slate-900'}`}>
+                  {item.value} <span className="text-xs text-slate-500 font-semibold">{item.unit}</span>
                 </span>
-                <span className="text-[11px] font-mono text-zinc-500">{card.unit}</span>
-              </div>
-
-              <div className="mt-1.5 text-[10px] font-mono text-zinc-500">
-                {card.benchmark}
-              </div>
-
-              <div className="mt-2 text-[10px] text-zinc-400 leading-snug border-t border-zinc-900 pt-1.5">
-                {card.detail}
+                {item.isAnomalous ? (
+                  <span className="text-[10px] uppercase font-bold text-rose-600 tracking-wider">Anomaly</span>
+                ) : (
+                  <span className="text-[10px] uppercase font-bold text-emerald-600 tracking-wider">Normal</span>
+                )}
               </div>
             </div>
           );

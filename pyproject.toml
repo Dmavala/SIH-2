@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aegis-voice-sentinel"
+version = "1.1.0"
+description = "AEGIS Voice-Sentinel: Real-time audio deepfake detection & in-call defense platform (MHA/I4C/DoT)"
+requires-python = ">=3.10"
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["backend/requirements.txt"] }
+
+[tool.setuptools]
+packages = ["backend", "backend.models", "backend.pipeline", "backend.features", "backend.training"]
+
+[project.optional-dependencies]
+stt = [
+    "SpeechRecognition>=3.10.0",
+    "pyaudio>=0.2.13; sys_platform != 'linux'",
+]
+ai = [
+    "google-genai>=1.0.0",
+]
+pdf = [
+    "reportlab>=4.0.0",
+]
+ssl = [
+    "transformers>=4.40.0",
+]
+postgres = [
+    "psycopg2-binary>=2.9.9",
+]
+dev = [
+    "pytest>=8.0.0",
+    "httpx>=0.27.0",
+]
+all = [
+    "aegis-voice-sentinel[stt,ai,pdf,ssl,postgres,dev]",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

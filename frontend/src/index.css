@@ -2,49 +2,125 @@
 
 :root {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #09090b;
-  color: #f4f4f5;
+  background-color: #f8fafc;
+  color: #0f172a;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom minimal monochrome scrollbars */
+/* Accessible focus rings */
+:focus-visible {
+  outline: 2px solid #0f172a;
+  outline-offset: 2px;
+}
+
+/* Font Scaling Modes */
+.font-scale-sm {
+  font-size: 0.9rem;
+}
+.font-scale-md {
+  font-size: 1rem;
+}
+.font-scale-lg {
+  font-size: 1.125rem;
+}
+.font-scale-xl {
+  font-size: 1.25rem;
+}
+
+/* High Contrast Mode for Low Vision */
+.high-contrast {
+  color-scheme: light;
+}
+.high-contrast body,
+.high-contrast {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+.high-contrast * {
+  border-color: #000000 !important;
+}
+.high-contrast button,
+.high-contrast input,
+.high-contrast select {
+  border: 2px solid #000000 !important;
+}
+.high-contrast :focus-visible {
+  outline: 3px solid #000000 !important;
+  outline-offset: 3px !important;
+}
+.high-contrast .bg-slate-50,
+.high-contrast .bg-slate-100,
+.high-contrast .bg-slate-200 {
+  background-color: #f4f4f5 !important;
+}
+
+/* Reduced Motion Mode for Vestibular Sensitivity */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* High Legibility / Dyslexia-Friendly Typography */
+.dyslexia-font {
+  letter-spacing: 0.04em !important;
+  word-spacing: 0.08em !important;
+  line-height: 1.6 !important;
+}
+.dyslexia-font * {
+  letter-spacing: inherit;
+}
+
+/* Skip to Content Accessible Link */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 0.75rem 1.25rem;
+  z-index: 9999;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  transition: top 0.15s ease-out;
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* Subtle, clean scrollbars for light theme */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
-  border-radius: 2px;
+  background: #cbd5e1;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: #94a3b8;
 }
 
-/* Pulse animation for radar threat meter */
-@keyframes radar-pulse {
-  0% {
-    transform: scale(0.95);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.4;
-  }
-  100% {
-    transform: scale(0.95);
-    opacity: 0.8;
+/* Clean print styling */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
   }
 }
 
-.radar-glow {
-  animation: radar-pulse 2s infinite ease-in-out;
-}

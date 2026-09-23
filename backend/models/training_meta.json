@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-09-22 11:14:22",
+  "data_mode": "REAL DATA",
+  "num_clips": 167,
+  "epochs": 4,
+  "args": {
+    "data_dir": "large_benchmark_data,test_realworld_samples,scam_call_data",
+    "synthetic": false,
+    "epochs": 4,
+    "batch_size": 16,
+    "lr": 0.001,
+    "val_fraction": 0.15,
+    "arch": "aasist",
+    "resume": true
+  },
+  "results": {
+    "AASIST": {
+      "best_val_eer": 0.0,
+      "best_val_acc": 0.76,
+      "history": [
+        {
+          "epoch": 1,
+          "loss": 0.4547,
+          "train_acc": 0.7969,
+          "val_eer": 0.0,
+          "val_acc": 0.56
+        },
+        {
+          "epoch": 2,
+          "loss": 0.4819,
+          "train_acc": 0.8125,
+          "val_eer": 0.0,
+          "val_acc": 0.72
+        },
+        {
+          "epoch": 3,
+          "loss": 0.4124,
+          "train_acc": 0.8281,
+          "val_eer": 0.0,
+          "val_acc": 0.76
+        },
+        {
+          "epoch": 4,
+          "loss": 0.4427,
+          "train_acc": 0.8047,
+          "val_eer": 0.0,
+          "val_acc": 0.76
+        }
+      ]
+    }
+  }
+}
