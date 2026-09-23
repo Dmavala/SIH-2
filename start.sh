@@ -20,5 +20,11 @@ if [ ! -f "frontend/dist/index.html" ]; then
     (cd frontend && npm ci && npm run build)
 fi
 
+# Find Python with required dependencies
+PYTHON_BIN="python3"
+if [ -x "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3" ]; then
+    PYTHON_BIN="/Library/Frameworks/Python.framework/Versions/3.14/bin/python3"
+fi
+
 # Run the FastAPI backend (serves the built frontend from frontend/dist)
-exec python3 -m uvicorn backend.main:app --host 0.0.0.0 --port "$PORT"
+exec "$PYTHON_BIN" -m uvicorn backend.main:app --host 0.0.0.0 --port "$PORT"

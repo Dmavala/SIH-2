@@ -70,14 +70,14 @@ def test_generate_dossier():
         print('[PASS] /api/generate-dossier: Section 63 BSA 2023 certificate generated:', cert['legal_header']['dossier_id'])
 
 def test_analyze_file():
-    sample_file = os.path.join('backend', 'demo_audio', 'samples', 'authentic_human_indian_accent.wav')
+    sample_file = os.path.join('backend', 'demo_audio', 'samples', 'real_authentic_indian_accent.wav')
     with open(sample_file, 'rb') as f:
         file_bytes = f.read()
 
     boundary = '----BoundaryXYZ123'
     body = bytearray()
     body.extend(f'--{boundary}\r\n'.encode('utf-8'))
-    body.extend(b'Content-Disposition: form-data; name="file"; filename="authentic_human_indian_accent.wav"\r\n')
+    body.extend(b'Content-Disposition: form-data; name="file"; filename="real_authentic_indian_accent.wav"\r\n')
     body.extend(b'Content-Type: audio/wav\r\n\r\n')
     body.extend(file_bytes)
     body.extend(b'\r\n')
