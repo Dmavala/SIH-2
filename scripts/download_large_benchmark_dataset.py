@@ -14,7 +14,7 @@ import time
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTPUT_DIR = os.path.join(ROOT_DIR, "large_benchmark_data")
 os.makedirs(os.path.join(OUTPUT_DIR, "fake"), exist_ok=True)
 os.makedirs(os.path.join(OUTPUT_DIR, "real"), exist_ok=True)
